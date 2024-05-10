@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_bloc/count_bloc/count_bloc.dart';
+import 'package:test_bloc/products_bloc/products_bloc.dart';
 
 void main() {
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider<CountBloc>(create: (context) => CountBloc()),
+      BlocProvider<ProductsBloc>(
+          create: (context) => ProductsBloc()..add(FetchProducts())),
     ],
     child: const MyApp(),
   ));
@@ -51,15 +53,24 @@ class _MyHomePageState extends State<MyHomePage> {
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Text(
-                  'You have pushed the button this many times:',
-                ),
-                BlocBuilder<CountBloc, CountState>(
+              children: [
+                BlocBuilder<ProductsBloc, ProductsState>(
                   builder: (context, state) {
-                    return Text(
-                      '${state.count}',
-                      style: Theme.of(context).textTheme.headlineMedium,
+                    return Flexible(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: state.pList!.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                  '${state.pList![index].thumbnail}'),
+                            ),
+                            title: Text('${state.pList![index].title}'),
+                            subtitle: Text('${state.pList![index].price}'),
+                          );
+                        },
+                      ),
                     );
                   },
                 ),
